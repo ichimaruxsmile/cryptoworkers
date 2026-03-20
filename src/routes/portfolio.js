@@ -1,7 +1,7 @@
-// Portfolio route handler — holdings with P&L and summary
+// Portfolio route handlers — list holdings with P&L, add holding
 
-import { holdings, coins } from '../mock/data.js';
-import { success } from '../middleware/response.js';
+import { holdings, coins, addHolding } from '../mock/data.js';
+import { success, error } from '../middleware/response.js';
 
 // ─── GET /api/portfolio ──────────────────────────────────
 export function handlePortfolio() {
@@ -47,4 +47,43 @@ export function handlePortfolio() {
       total_pnl_pct: totalPnlPct,
     },
   });
+}
+
+// ─── POST /api/portfolio ─────────────────────────────────
+export async function handleAddHolding(request) {
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return error('Invalid JSON body', 400);
+  }
+
+  const { coin_id, amount, avg_cost } = body;
+
+  if (!coin_id || !amount || !avg_cost) {
+    return error('Missing required fields: coin_id, amount, avg_cost', 400);
+  }
+
+  if (typeof amount !== 'number' || amount <= 0) {
+    return error('amount must be a positive number', 400);
+  }
+
+  if (typeof avg_cost !== 'number' || avg_cost <= 0) {
+    return error('avg_cost must be a positive number', 400);
+  }
+
+  const coin = coins.find((c) => c.id === coin_id);
+  if (!coin) {
+    return error(`Coin '${coin_id}' not found`, 404);
+  }
+
+  const holding = addHolding({ coin_id, amount, avg_cost });
+
+  return success({
+    coin_id: holding.coin_id,
+    coin_name: coin.name,
+    coin_symbol: coin.symbol,
+    amount: holding.amount,
+    avg_cost: holding.avg_cost,
+  }, 201);
 }

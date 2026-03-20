@@ -6,7 +6,7 @@ import { handleOptions, addCorsHeaders } from './middleware/cors.js';
 import { success, error } from './middleware/response.js';
 import { handleCoins, handleCoinDetail, handleKline } from './routes/market.js';
 import { handleGetAlerts, handleCreateAlert, handleDeleteAlert } from './routes/alerts.js';
-import { handlePortfolio } from './routes/portfolio.js';
+import { handlePortfolio, handleAddHolding } from './routes/portfolio.js';
 
 const VERSION = '1.0.0';
 const PHASE = 1;
@@ -43,6 +43,7 @@ export default {
             'POST /api/alerts',
             'DELETE /api/alerts/:id',
             'GET  /api/portfolio',
+            'POST /api/portfolio',
           ],
         });
       }
@@ -81,9 +82,14 @@ export default {
         response = handleDeleteAlert(id);
       }
 
-      // Portfolio
+      // Portfolio — list
       else if (pathname === '/api/portfolio' && method === 'GET') {
         response = handlePortfolio();
+      }
+
+      // Portfolio — add holding
+      else if (pathname === '/api/portfolio' && method === 'POST') {
+        response = await handleAddHolding(request);
       }
 
       // ── 404 fallback ───────────────────────────────────

@@ -225,3 +225,17 @@ export const holdings = [
   { coin_id: 'solana', amount: 100, avg_cost: 98 },
   { coin_id: 'dogecoin', amount: 50000, avg_cost: 0.12 },
 ];
+
+export function addHolding({ coin_id, amount, avg_cost }) {
+  const existing = holdings.find((h) => h.coin_id === coin_id);
+  if (existing) {
+    // Merge: weighted average cost
+    const totalAmount = existing.amount + amount;
+    existing.avg_cost = +((existing.avg_cost * existing.amount + avg_cost * amount) / totalAmount).toFixed(6);
+    existing.amount = totalAmount;
+    return existing;
+  }
+  const entry = { coin_id, amount, avg_cost };
+  holdings.push(entry);
+  return entry;
+}
