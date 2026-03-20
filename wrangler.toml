@@ -1,0 +1,9 @@
+name = "cryptoscope-api"
+main = "src/index.js"
+compatibility_date = "2024-09-25"
+
+[env.dev]
+name = "cryptoscope-api-dev"
+
+[env.production]
+name = "cryptoscope-api"
